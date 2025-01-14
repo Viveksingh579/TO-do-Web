@@ -12,10 +12,14 @@ import {
   Box,
   Typography,
   TablePagination,
+  Checkbox,
+  Tooltip, // Import Tooltip from @mui/material
+  IconButton // Import IconButton from @mui/material
 } from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material'; // Import icons for edit and delete
 
 function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
-  const [editId, setEditId] = useState(null);  // Use task's unique _id for edit tracking
+  const [editId, setEditId] = useState(null); // Use task's unique _id for edit tracking
   const [editTask, setEditTask] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -31,6 +35,14 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
       handleUpdateTask(editId, editTask); // Pass the task _id and updated task
       setEditId(null); // Reset edit mode
       setEditTask({});
+    }
+  };
+
+  const handleCheckboxChange = (taskId, checked) => {
+    const updatedTask = tasks.find(task => task._id === taskId);
+    if (updatedTask) {
+      updatedTask.completed = checked;
+      handleUpdateTask(taskId, updatedTask);
     }
   };
 
@@ -56,24 +68,27 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
         <Table sx={{ width: '100%' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Sr. No.</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Time</TableCell>
-              {handleUpdateTask && handleDeleteTask && <TableCell>Actions</TableCell>}
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Sr. No.</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Title</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Category</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Description</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Date</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Time</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Completed</TableCell> {/* Add a column for completed checkmarks */}
+              {handleUpdateTask && handleDeleteTask && <TableCell sx={{ fontWeight: 'bold', color: 'black' }}>Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((task, index) => (
-              <TableRow key={task._id}>
+              <TableRow key={task._id} hover>
                 <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                 <TableCell>
                   {editId === task._id ? (
                     <TextField
                       value={editTask.title || ''}
                       onChange={(e) => setEditTask({ ...editTask, title: e.target.value })}
+                      variant="outlined"
+                      size="small"
                     />
                   ) : (
                     task.title
@@ -84,6 +99,8 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
                     <TextField
                       value={editTask.category || ''}
                       onChange={(e) => setEditTask({ ...editTask, category: e.target.value })}
+                      variant="outlined"
+                      size="small"
                     />
                   ) : (
                     task.category
@@ -94,6 +111,10 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
                     <TextField
                       value={editTask.description || ''}
                       onChange={(e) => setEditTask({ ...editTask, description: e.target.value })}
+                      variant="outlined"
+                      size="small"
+                      multiline
+                      rows={2}
                     />
                   ) : (
                     task.description
@@ -105,6 +126,8 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
                       type="date"
                       value={editTask.date || ''}
                       onChange={(e) => setEditTask({ ...editTask, date: e.target.value })}
+                      variant="outlined"
+                      size="small"
                     />
                   ) : (
                     task.date
@@ -116,11 +139,20 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
                       type="time"
                       value={editTask.time || ''}
                       onChange={(e) => setEditTask({ ...editTask, time: e.target.value })}
+                      variant="outlined"
+                      size="small"
                     />
                   ) : (
                     task.time
                   )}
                 </TableCell>
+                <TableCell>
+                  <Checkbox
+                    checked={task.completed || false}
+                    onChange={(e) => handleCheckboxChange(task._id, e.target.checked)}
+                    color="primary"
+                  />
+                </TableCell> {/* Add Checkbox to each row */}
                 {handleUpdateTask && handleDeleteTask && (
                   <TableCell>
                     {editId === task._id ? (
@@ -129,21 +161,22 @@ function TaskTable({ tasks, handleUpdateTask, handleDeleteTask }) {
                       </Button>
                     ) : (
                       <>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => handleEditClick(task._id)}
-                          sx={{ marginRight: 1 }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => handleDeleteTaskClick(task._id)}
-                        >
-                          Delete
-                        </Button>
+                        <Tooltip title="Edit">
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleEditClick(task._id)}
+                          >
+                            <Edit />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton
+                            color="secondary"
+                            onClick={() => handleDeleteTaskClick(task._id)}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
                       </>
                     )}
                   </TableCell>

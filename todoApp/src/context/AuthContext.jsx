@@ -2,18 +2,17 @@ import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = (username, password) => {
-    // Dummy authentication logic
+    // Dummy authentication logic - Replace this with real authentication logic
     if ((username === 'admin' && password === 'adminpass') || (username === 'user' && password === 'userpass')) {
       const role = username === 'admin' ? 'admin' : 'user';
       setUser({ username, role });
+      console.log('Logged in as:', { username, role }); // Debug log
       return true;
     }
     return false;
@@ -21,6 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    console.log('User logged out'); // Debug log
   };
 
   return (
@@ -29,4 +29,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

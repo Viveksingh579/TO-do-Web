@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, Typography, AppBar, Toolbar, Container } from "@mui/material";
 import TaskTable from "./TaskTable";
 import { addTask, getTasks, updateTask, deleteTask } from "../api"; // Import the functions
+import { useAuth } from '../context/AuthContext'; // Import your context
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const AdminPanel = () => {
+  const { logout } = useAuth(); // Access the logout function from the custom hook
+  const navigate = useNavigate(); // Initialize the navigate function
   const [tasks, setTasks] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [newTask, setNewTask] = useState({
@@ -74,23 +78,37 @@ const AdminPanel = () => {
       alert("Error deleting task!");
     }
   };
-  
-  
-  
-  
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login'); // Navigate to login page
+  };
 
   return (
-    <div>
-      <h2>Admin Panel</h2>
-      <Button variant="contained" color="primary" onClick={handleDialogOpen}>
-        Add Task
-      </Button>
-      <TaskTable
-        tasks={tasks}
-        handleUpdateTask={handleUpdateTask}
-        handleDeleteTask={handleDeleteTask}
-      />
-
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Admin Panel
+          </Typography>
+          <Button color="inherit" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="xl" sx={{ mt: 4, flex: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Typography variant="h4">Task Management</Typography>
+          <Button variant="contained" color="primary" onClick={handleDialogOpen}>
+            Add Task
+          </Button>
+        </Box>
+        <TaskTable
+          tasks={tasks}
+          handleUpdateTask={handleUpdateTask}
+          handleDeleteTask={handleDeleteTask}
+        />
+      </Container>
       <Dialog
         open={openDialog}
         onClose={handleDialogClose}
@@ -138,7 +156,7 @@ const AdminPanel = () => {
             required
             margin="dense"
             name="date"
-             placeholder="Enter Date"
+            placeholder="Enter Date"
             type="date"
             fullWidth
             value={newTask.date}
@@ -164,7 +182,7 @@ const AdminPanel = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 };
 

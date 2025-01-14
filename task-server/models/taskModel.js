@@ -6,6 +6,7 @@ const taskSchema = new mongoose.Schema({
   description: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },
+  completed: { type: Boolean, default: false }, // Add completed field
 }, {
   timestamps: true, // Automatically adds createdAt and updatedAt fields
 });

@@ -20,7 +20,7 @@ const addTask = async (req, res) => {
   }
 
   try {
-    const newTask = new Task({ title, category, description, date, time });
+    const newTask = new Task({ title, category, description, date, time, completed: false }); // Initialize completed field
     const savedTask = await newTask.save();
     res.status(201).json(savedTask);
   } catch (err) {
@@ -31,7 +31,7 @@ const addTask = async (req, res) => {
 // Update a task
 const updateTask = async (req, res) => {
   const { id } = req.params;
-  const { title, category, description, date, time } = req.body;
+  const { title, category, description, date, time, completed } = req.body; // Add completed field
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: 'Invalid Task ID format.' });
@@ -40,7 +40,7 @@ const updateTask = async (req, res) => {
   try {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { title, category, description, date, time },
+      { title, category, description, date, time, completed }, // Add completed field
       { new: true, runValidators: true }
     );
 
@@ -76,4 +76,3 @@ const deleteTask = async (req, res) => {
 };
 
 module.exports = { getAllTasks, addTask, updateTask, deleteTask };
-
