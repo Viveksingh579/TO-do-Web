@@ -1,12 +1,11 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CssBaseline, Box } from '@mui/material';
-import { AuthProvider } from './context/AuthContext'; // Adjust the import path as necessary
-import { TaskProvider } from './context/TaskContext'; // Adjust the import path as necessary
-import Login from './Components/Login'; // Ensure the casing matches the actual directory name
-import AdminPanel from './Components/AdminPanel'; // Ensure the casing matches the actual directory name
-import UserTaskView from './Components/UserTaskView'; // Ensure the casing matches the actual directory name
-import ProtectedRoute from './Components/ProtectedRoute'; // Import the ProtectedRoute component
+import { AuthProvider } from './context/AuthContext';
+import { TaskProvider } from './context/TaskContext';
+import Login from './Components/Login';
+import AdminPanel from './Components/AdminPanel';
+import UserTaskView from './Components/UserTaskView';
+import ProtectedRoute from './Components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -15,21 +14,21 @@ const App = () => {
         <CssBaseline />
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route 
-            path="/tasks" 
+          <Route
+            path="/tasks"
             element={
               <ProtectedRoute>
                 <UserTaskView />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/admin" 
+          <Route
+            path="/admin"
             element={
               <ProtectedRoute adminOnly>
                 <AdminPanel />
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
       </Box>

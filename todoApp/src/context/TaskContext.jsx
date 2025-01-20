@@ -5,14 +5,20 @@ const TaskContext = createContext();
 
 export const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setLoading(true);
       try {
         const fetchedTasks = await getTasks();
         setTasks(fetchedTasks);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
+      } catch (err) {
+        console.error('Error fetching tasks:', err);
+        setError(err.message || 'Failed to fetch tasks.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -20,24 +26,26 @@ export const TaskProvider = ({ children }) => {
   }, []);
 
   const addTask = (task) => {
-    setTasks([...tasks, { ...task, _id: tasks.length + 1 }]);
+    setTasks((prevTasks) => [...prevTasks, { ...task, _id: prevTasks.length + 1 }]);
   };
 
   const updateTask = (index, updatedTask) => {
-    const updatedTasks = tasks.map((task, i) => (i === index ? updatedTask : task));
-    setTasks(updatedTasks);
+    setTasks((prevTasks) =>
+      prevTasks.map((task, i) => (i === index ? updatedTask : task))
+    );
   };
 
   const deleteTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+    setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
   };
 
   return (
-    <TaskContext.Provider value={{ tasks, addTask, updateTask, deleteTask }}>
+    <TaskContext.Provider
+      value={{ tasks, addTask, updateTask, deleteTask, loading, error }}
+    >
       {children}
     </TaskContext.Provider>
   );
 };
 
 export const useTasks = () => useContext(TaskContext);
-

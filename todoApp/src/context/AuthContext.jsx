@@ -1,18 +1,28 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
 
   const login = (username, password) => {
-    // Dummy authentication logic - Replace this with real authentication logic
     if ((username === 'admin' && password === 'adminpass') || (username === 'user' && password === 'userpass')) {
       const role = username === 'admin' ? 'admin' : 'user';
-      setUser({ username, role });
-      console.log('Logged in as:', { username, role }); // Debug log
+      const userData = { username, role };
+      setUser(userData);
       return true;
     }
     return false;
@@ -20,7 +30,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    console.log('User logged out'); // Debug log
   };
 
   return (

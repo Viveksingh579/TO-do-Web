@@ -1,34 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Box, Typography, Container, AppBar, Toolbar } from '@mui/material'; // Import required components from @mui/material
+import React, { useEffect } from 'react';
+import { Button, Box, Typography, Container, AppBar, Toolbar } from '@mui/material';
 import { useTasks } from '../context/TaskContext';
 import TaskTable from './TaskTable';
-import { useAuth } from '../context/AuthContext'; // Import useAuth hook
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { updateTask } from '../api';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { updateTask as updateTaskAPI } from '../api';
 
 const UserTaskView = () => {
-  const { tasks } = useTasks();
-  const { logout } = useAuth(); // Access the logout function
-  const navigate = useNavigate(); // Initialize the navigate function
-  const [_tasks, setTasks] = useState(tasks);
+  const { tasks, updateTask } = useTasks(); // Access tasks and updateTask from the context
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    console.log('Tasks:', tasks); // Debug log to check tasks state
+    console.log('Tasks:', tasks); // Debug log to monitor tasks state
   }, [tasks]);
 
   const handleLogout = () => {
     logout();
-    navigate('/login'); // Navigate to login page after logout
+    navigate('/login');
   };
 
   const handleUpdateTask = async (taskId, updatedTask) => {
-      try {
-        const updated = await updateTask(taskId, updatedTask);
-        setTasks(tasks.map((task) => (task._id === taskId ? updated : task)));
-      } catch (error) {
-        console.error('Error updating task:', error);
-        alert("Error updating task!");
-      }
-    };
+    try {
+      const updated = await updateTaskAPI(taskId, updatedTask);
+      updateTask(taskId, updated); // Use the context to update tasks
+    } catch (error) {
+      console.error('Error updating task:', error);
+      alert('Error updating task!');
+    }
+  };
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -47,7 +47,7 @@ const UserTaskView = () => {
           <Typography variant="h4" align="center" gutterBottom>
             My Tasks
           </Typography>
-          <TaskTable tasks={_tasks} handleUpdateTask={handleUpdateTask} />
+          <TaskTable tasks={tasks} handleUpdateTask={handleUpdateTask} />
         </Container>
       </Box>
     </Box>
